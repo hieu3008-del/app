@@ -1,3 +1,5 @@
+pip install -r requirements.txt
+python main.py
 import os
 import logging
 import json # Added for JSON parsing
