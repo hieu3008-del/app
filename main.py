@@ -1,8 +1,7 @@
-pip install -r requirements.txt
-python main.py
 import os
 import logging
-import json # Added for JSON parsing
+import json
+import asyncio # Import asyncio for event loop management
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
@@ -261,5 +260,15 @@ async def main() -> None:
 
 if __name__ == "__main__":
     # This block ensures the async main function is run when the script is executed.
-    import asyncio
-    asyncio.run(main())
+    # It now safely handles cases where an event loop might already be running.
+    try:
+        # Attempt to get the currently running event loop
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        # If no loop is running, create a new one and run the main coroutine
+        asyncio.run(main())
+    else:
+        # If a loop is already running, schedule main as a task on that loop
+        # and keep the loop running indefinitely. This is common in some hosting environments.
+        loop.create_task(main())
+        loop.run_forever()
